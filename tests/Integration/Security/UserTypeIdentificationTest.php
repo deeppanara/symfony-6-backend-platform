@@ -1,0 +1,399 @@
+<?php
+/*
+ * *************************************************************************
+ * Copyright (C) 2023, Inc - All Rights Reserved
+ * This file is part of the Dom bundle.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author   Deep Panara <panaradeep@gmail.com>
+ * @date     01/05/23, 12:25 pm
+ * *************************************************************************
+ */
+
+declare(strict_types = 1);
+/**
+ * /tests/Integration/Security/UserTypeIdentificationTest.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Integration\Security;
+
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
+use Platform\Entity\ApiKey;
+use Platform\Entity\User;
+use Platform\Repository\UserRepository;
+use Platform\Security\ApiKeyUser;
+use Platform\Security\Provider\ApiKeyUserProvider;
+use Platform\Security\SecurityUser;
+use Platform\Security\UserTypeIdentification;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\InMemoryUser;
+use Throwable;
+
+/**
+ * Class UserTypeIdentificationTest
+ *
+ * @package App\Tests\Integration\Security
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class UserTypeIdentificationTest extends KernelTestCase
+{
+    /**
+     * @throws Throwable
+     */
+    #[DataProvider('dataProviderTestThatGetApiKeyReturnsNullWhenTokenIsNotValid')]
+    #[TestDox('Test that `getApiKey` returns null when using `$token` as a token')]
+    public function testThatGetApiKeyReturnsNullWhenTokenIsNotValid(?TokenInterface $token): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertNull(
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getApiKey(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getApiKey` returns correct user')]
+    public function testThatGetApiKeyReturnsExpectedApiKey(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $apiKey = new ApiKey();
+        $apiKeyUser = new ApiKeyUser($apiKey, []);
+        $token = new UsernamePasswordToken($apiKeyUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $apiKeyUserProviderMock
+            ->expects(self::once())
+            ->method('getApiKeyForToken')
+            ->with($apiKeyUser->getUserIdentifier())
+            ->willReturn($apiKey);
+
+        self::assertSame(
+            $apiKey,
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getApiKey(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[DataProvider('dataProviderTestThatGetUserReturnsNullWhenTokenIsNotValid')]
+    #[TestDox('Test that `getUser` returns null when using `$token` as a token')]
+    public function testThatGetUserReturnsNullWhenTokenIsNotValid(?TokenInterface $token): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertNull(
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getUser(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getUser` returns correct user')]
+    public function testThatGetUserReturnsExpectedUser(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $user = (new User())->setUsername('some-username');
+        $securityUser = new SecurityUser($user);
+        $token = new UsernamePasswordToken($securityUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $userRepositoryMock
+            ->expects(self::once())
+            ->method('loadUserByIdentifier')
+            ->with($user->getId(), true)
+            ->willReturn($user);
+
+        self::assertSame(
+            $user,
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getUser(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[DataProvider('dataProviderTestThatGetIdentityReturnsNullWhenTokenIsNotValid')]
+    #[TestDox('Test that `getIdentity` returns null when using `$token` as a token')]
+    public function testThatGetIdentityReturnsNullWhenTokenIsNotValid(?TokenInterface $token): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $tokenStorageMock
+            ->expects(self::exactly(2))
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertNull(
+            (new UserTypeIdentification(
+                $tokenStorageMock,
+                $userRepositoryMock,
+                $apiKeyUserProviderMock
+            ))->getIdentity(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getIdentity` returns correct `SecurityUser` instance')]
+    public function testThatGetIdentityReturnsExpectedSecurityUser(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $securityUser = new SecurityUser(new User());
+        $token = new UsernamePasswordToken($securityUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(
+            $securityUser,
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getIdentity()
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getIdentity` returns correct `ApiKeyUser` instance')]
+    public function testThatGetIdentityReturnsExpectedApiKeyUser(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $apiKeyUser = new ApiKeyUser(new ApiKey(), []);
+        $token = new UsernamePasswordToken($apiKeyUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::exactly(2))
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(
+            $apiKeyUser,
+            (new UserTypeIdentification($tokenStorageMock, $userRepositoryMock, $apiKeyUserProviderMock))->getIdentity()
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[DataProvider('dataProviderTestThatGetApiKeyUserReturnsNullWhenTokenIsNotValid')]
+    #[TestDox('Test that `getApiKeyUser` returns null when using `$token` as a token')]
+    public function testThatGetApiKeyUserReturnsNullWhenTokenIsNotValid(?TokenInterface $token): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertNull(
+            (new UserTypeIdentification(
+                $tokenStorageMock,
+                $userRepositoryMock,
+                $apiKeyUserProviderMock
+            ))->getApiKeyUser(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getApiKeyUser` returns correct user')]
+    public function testThatGetApiKeyUserReturnsExpectedUser(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $apiKeyUser = new ApiKeyUser(new ApiKey(), []);
+        $token = new UsernamePasswordToken($apiKeyUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(
+            $apiKeyUser,
+            (new UserTypeIdentification(
+                $tokenStorageMock,
+                $userRepositoryMock,
+                $apiKeyUserProviderMock
+            ))->getApiKeyUser(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[DataProvider('dataProviderTestThatGetSecurityUserReturnsNullWhenTokenIsNotValid')]
+    #[TestDox('Test that `getSecurityUser` returns null when using `$token` as a token')]
+    public function testThatGetSecurityUserReturnsNullWhenTokenIsNotValid(?TokenInterface $token): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertNull(
+            (new UserTypeIdentification(
+                $tokenStorageMock,
+                $userRepositoryMock,
+                $apiKeyUserProviderMock,
+            ))->getSecurityUser(),
+        );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    #[TestDox('Test that `getSecurityUser` returns correct user')]
+    public function testThatGetSecurityUserReturnsExpectedUser(): void
+    {
+        $tokenStorageMock = $this->createMock(TokenStorageInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $apiKeyUserProviderMock = $this->createMock(ApiKeyUserProvider::class);
+
+        $securityUser = new SecurityUser(new User());
+        $token = new UsernamePasswordToken($securityUser, 'credentials', ['providerKey']);
+
+        $tokenStorageMock
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        self::assertSame(
+            $securityUser,
+            (new UserTypeIdentification(
+                $tokenStorageMock,
+                $userRepositoryMock,
+                $apiKeyUserProviderMock,
+            ))->getSecurityUser(),
+        );
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    public static function dataProviderTestThatGetUserReturnsNullWhenTokenIsNotValid(): Generator
+    {
+        return self::getInvalidTokens();
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    public static function dataProviderTestThatGetApiKeyReturnsNullWhenTokenIsNotValid(): Generator
+    {
+        return self::getInvalidTokens();
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    public static function dataProviderTestThatGetSecurityUserReturnsNullWhenTokenIsNotValid(): Generator
+    {
+        return self::getInvalidTokens();
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    public static function dataProviderTestThatGetApiKeyUserReturnsNullWhenTokenIsNotValid(): Generator
+    {
+        return self::getInvalidTokens();
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    public static function dataProviderTestThatGetIdentityReturnsNullWhenTokenIsNotValid(): Generator
+    {
+        return self::getInvalidTokens();
+    }
+
+    /**
+     * @return Generator<array{0: \Symfony\Component\Security\Core\Authentication\Token\AbstractToken|null}>
+     */
+    private static function getInvalidTokens(): Generator
+    {
+        yield [null];
+
+        yield [new UsernamePasswordToken(
+            new InMemoryUser('username', 'password'),
+            'credentials',
+            ['providerKey']
+        )];
+
+        yield [new PreAuthenticatedToken(
+            new InMemoryUser('username', 'password'),
+            'credentials',
+            ['providerKey'],
+        )];
+
+        yield [new RememberMeToken(
+            new InMemoryUser('username', 'password'),
+            'provider-key',
+            'some-secret',
+        )];
+    }
+}

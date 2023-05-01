@@ -1,0 +1,26 @@
+{
+	"name": "tarlepp/symfony-flex-backend-tools",
+	"description": "",
+	"require": {
+		"php": "^8.2.0"
+	},
+	"require-dev": {
+		"liuggio/fastest": "1.11.0",
+		"phpunit/php-code-coverage": "10.0.2",
+		"phpunit/phpcov": "9.0.0",
+		"phpunit/phpunit": "10.0.19",
+		"roave/security-advisories": "dev-latest",
+		"symfony/browser-kit": "6.2.7",
+		"symfony/phpunit-bridge": "6.2.7"
+	},
+	"config": {
+		"allow-plugins": true,
+		"platform": {
+			"php": "8.2.0"
+		},
+		"preferred-install": {
+			"*": "dist"
+		},
+		"sort-packages": true
+	}
+}

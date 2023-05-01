@@ -1,0 +1,27 @@
+<?php
+declare(strict_types = 1);
+/**
+ * /tests/Integration/DTO/User/UserCreateTest.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Integration\DTO\User;
+
+use App\Tests\Integration\TestCase\DtoTestCase;
+use Platform\DTO\User\UserCreate;
+
+/**
+ * Class UserCreateTest
+ *
+ * @package App\Tests\Integration\DTO\User
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class UserCreateTest extends DtoTestCase
+{
+    /**
+     * @psalm-var class-string
+     * @phpstan-var class-string<UserCreate>
+     */
+    protected static string $dtoClass = UserCreate::class;
+}

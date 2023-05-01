@@ -1,0 +1,54 @@
+<?php
+declare(strict_types = 1);
+/**
+ * /tests/Integration/AutoMapper/TestRestRequestMapperDto.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Integration\AutoMapper\src;
+
+use Platform\DTO\RestDto;
+use Platform\DTO\RestDtoInterface;
+use Platform\Entity\Interfaces\EntityInterface;
+
+/**
+ * Class TestRestRequestMapperDto
+ *
+ * @package App\Tests\Integration\AutoMapper\src
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class TestRestRequestMapperDto extends RestDto
+{
+    protected string $someProperty = '';
+    protected string $someTransformProperty = '';
+
+    public function load(EntityInterface $entity): RestDtoInterface
+    {
+        return $this;
+    }
+
+    public function getSomeProperty(): string
+    {
+        return $this->someProperty;
+    }
+
+    public function setSomeProperty(string $someProperty): self
+    {
+        $this->someProperty = $someProperty;
+
+        return $this;
+    }
+
+    public function getSomeTransformProperty(): string
+    {
+        return $this->someTransformProperty;
+    }
+
+    public function setSomeTransformProperty(string $someTransformProperty): self
+    {
+        $this->someTransformProperty = $someTransformProperty;
+
+        return $this;
+    }
+}

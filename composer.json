@@ -1,0 +1,142 @@
+{
+	"name": "deeppanara/symfony-6-backend-platform",
+	"type": "project",
+	"description": "JSON REST API which is build on top of Symfony framework.",
+	"keywords": [
+		"Symfony",
+		"API"
+	],
+	"homepage": "https://github.com/deeppanara/symfony-6-backend-platform",
+	"version": "0.0.0",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Deep Panara",
+			"email": "panaradeep@gmail.com",
+			"homepage": "https://github.com/deeppanara",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": "^8.2.0",
+		"ext-apcu": "*",
+		"ext-iconv": "*",
+		"ext-json": "*",
+		"ext-mbstring": "*",
+		"ext-pdo": "*",
+		"ext-random": "*",
+		"doctrine/doctrine-bundle": "2.9.1",
+		"doctrine/doctrine-migrations-bundle": "3.2.2",
+		"doctrine/migrations": "3.6.0",
+		"doctrine/orm": "2.14.2",
+		"gedmo/doctrine-extensions": "3.11.1",
+		"lexik/jwt-authentication-bundle": "2.18.1",
+		"mark-gerarts/automapper-plus-bundle": "1.4.1",
+		"matomo/device-detector": "6.1.1",
+		"matthiasnoback/symfony-console-form": "5.3.2",
+		"nelmio/api-doc-bundle": "4.11.1",
+		"nelmio/cors-bundle": "2.3.1",
+		"phpdocumentor/reflection-docblock": "5.3.0",
+		"ramsey/uuid-doctrine": "2.0.0",
+		"symfony/asset": "6.2.7",
+		"symfony/config": "6.2.7",
+		"symfony/console": "6.2.8",
+		"symfony/dotenv": "6.2.8",
+		"symfony/expression-language": "6.2.7",
+		"symfony/flex": "2.2.5",
+		"symfony/form": "6.2.8",
+		"symfony/framework-bundle": "6.2.9",
+		"symfony/monolog-bundle": "3.8.0",
+		"symfony/process": "6.2.8",
+		"symfony/property-access": "6.2.8",
+		"symfony/property-info": "6.2.8",
+		"symfony/routing": "6.2.8",
+		"symfony/runtime": "6.2.8",
+		"symfony/security-bundle": "6.2.8",
+		"symfony/serializer": "6.2.8",
+		"symfony/string": "6.2.8",
+		"symfony/translation": "6.2.8",
+		"symfony/twig-bundle": "6.2.7",
+		"symfony/validator": "6.2.8",
+		"symfony/yaml": "6.2.7"
+	},
+	"conflict": {
+		"symfony/debug": "<3.3",
+		"symfony/symfony": "*",
+		"symfony/twig-bundle": "<3.3"
+	},
+	"require-dev": {
+		"bamarni/composer-bin-plugin": "1.8.2",
+		"doctrine/doctrine-fixtures-bundle": "3.4.3",
+		"roave/security-advisories": "dev-latest",
+		"symfony/browser-kit": "6.2.7",
+		"symfony/debug-bundle": "6.2.7",
+		"symfony/maker-bundle": "1.48.0",
+		"symfony/requirements-checker": "2.0.1",
+		"symfony/stopwatch": "6.2.7",
+		"symfony/var-dumper": "6.2.8",
+		"symfony/web-profiler-bundle": "6.2.7"
+	},
+	"replace": {
+		"symfony/polyfill-ctype": "*",
+		"symfony/polyfill-mbstring": "*",
+		"symfony/polyfill-php72": "*",
+		"symfony/polyfill-php80": "*",
+		"symfony/polyfill-php81": "*"
+	},
+	"config": {
+		"allow-plugins": true,
+		"platform": {
+			"php": "8.2.0"
+		},
+		"sort-packages": true
+	},
+	"extra": {
+		"allow-contrib": "true",
+		"bamarni-bin": {
+			"bin-links": true,
+			"forward-command": true,
+			"target-directory": "tools"
+		},
+		"projectTitle": "Symfony Flex Backend",
+		"symfony": {
+			"allow-contrib": true
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "src/",
+			"Platform\\": "Platform/"
+		},
+		"classmap": [],
+		"exclude-from-classmap": []
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"App\\Tests\\": "tests/",
+			"PHPUnit\\": "tools/01_phpunit/vendor/phpunit/phpunit/src"
+		}
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"if test -d vendor/symfony/requirements-checker; then ./vendor/bin/requirements-checker; fi",
+			"if test -d vendor/bamarni/composer-bin-plugin; then make install-bin; fi",
+			"if which local-php-security-checker; then local-php-security-checker --update-cache && local-php-security-checker; fi",
+			"@auto-scripts",
+			"@composer dump-autoload"
+		],
+		"post-update-cmd": [
+			"if test -d vendor/symfony/requirements-checker; then ./vendor/bin/requirements-checker; fi",
+			"if test -d vendor/bamarni/composer-bin-plugin; then make update-bin; fi",
+			"if which local-php-security-checker; then local-php-security-checker --update-cache && local-php-security-checker; fi",
+			"@auto-scripts",
+			"@composer dump-autoload"
+		],
+		"auto-scripts": {
+			"cache:clear": "symfony-cmd",
+			"cache:warmup": "symfony-cmd",
+			"assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
+			"assets:install %PUBLIC_DIR%": "symfony-cmd"
+		}
+	}
+}

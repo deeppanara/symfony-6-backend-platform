@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../Platform/Controller/
+        namespace: Platform\Controller
+    type: attribute

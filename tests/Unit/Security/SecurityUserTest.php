@@ -1,0 +1,89 @@
+<?php
+/*
+ * *************************************************************************
+ * Copyright (C) 2023, Inc - All Rights Reserved
+ * This file is part of the Dom bundle.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author   Deep Panara <panaradeep@gmail.com>
+ * @date     01/05/23, 12:17 pm
+ * *************************************************************************
+ */
+
+declare(strict_types = 1);
+/**
+ * /tests/Unit/Security/SecurityUserTest.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Unit\Security;
+
+use PHPUnit\Framework\Attributes\TestDox;
+use Platform\Entity\User;
+use Platform\Security\SecurityUser;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use function str_rot13;
+
+/**
+ * Class SecurityUserTest
+ *
+ * @package App\Tests\Unit\Security
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class SecurityUserTest extends KernelTestCase
+{
+    #[TestDox('Test that `SecurityUser::getRoles` method returns expected roles')]
+    public function testThatGetRolesReturnsExpected(): void
+    {
+        $securityUser = new SecurityUser(new User(), ['Foo', 'Bar']);
+
+        self::assertSame(['Foo', 'Bar'], $securityUser->getRoles());
+    }
+
+    #[TestDox('Test that `SecurityUser::getPassword` method returns expected when using `str_rot13` as encoder')]
+    public function testThatGetPasswordReturnsExpected(): void
+    {
+        $encoder = fn (string $password): string => str_rot13($password);
+
+        $securityUser = new SecurityUser((new User())->setPassword($encoder, 'foobar'));
+
+        self::assertSame('sbbone', $securityUser->getPassword());
+    }
+
+    #[TestDox('Test that `SecurityUser::getSalt` method returns null')]
+    public function testThatGetSaltReturnNothing(): void
+    {
+        self::assertNull((new SecurityUser(new User()))->getSalt());
+    }
+
+    #[TestDox('Test that `SecurityUser::getUsername` method returns expected UUID')]
+    public function testThatGetUsernameReturnsExpected(): void
+    {
+        $user = new User();
+
+        self::assertSame($user->getId(), (new SecurityUser($user))->getUserIdentifier());
+    }
+
+    #[TestDox('Test that `SecurityUser::getUuid` method returns expected UUID')]
+    public function testThatGetUuidReturnsExpected(): void
+    {
+        $user = new User();
+
+        self::assertSame($user->getId(), (new SecurityUser($user))->getUuid());
+    }
+
+    #[TestDox('Test that password is present after `SecurityUser::eraseCredentials` method call')]
+    public function testThatPasswordIsPresentAfterEraseCredential(): void
+    {
+        $encoder = fn (string $password): string => str_rot13($password);
+
+        $securityUser = new SecurityUser((new User())->setPassword($encoder, 'foobar'));
+
+        $securityUser->eraseCredentials();
+
+        self::assertSame('sbbone', $securityUser->getPassword());
+    }
+}

@@ -1,0 +1,260 @@
+<?php
+/*
+ * *************************************************************************
+ * Copyright (C) 2023, Inc - All Rights Reserved
+ * This file is part of the Dom bundle.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author   Deep Panara <panaradeep@gmail.com>
+ * @date     01/05/23, 12:27 pm
+ * *************************************************************************
+ */
+
+declare(strict_types = 1);
+/**
+ * /src/Entity/UserGroup.php
+ *
+ */
+
+namespace Platform\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
+use Platform\Entity\Interfaces\EntityInterface;
+use Platform\Entity\Traits\Blameable;
+use Platform\Entity\Traits\Timestampable;
+use Platform\Entity\Traits\Uuid;
+use Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType;
+use Ramsey\Uuid\UuidInterface;
+use Stringable;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+/**
+ *
+ */
+#[ORM\Entity]
+#[ORM\Table(
+    name: 'user_group',
+)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
+class UserGroup implements EntityInterface, Stringable
+{
+    use Blameable;
+    use Timestampable;
+    use Uuid;
+
+    final public const SET_USER_PROFILE_GROUPS = 'set.UserProfileGroups';
+    final public const SET_USER_GROUP_BASIC = 'set.UserGroupBasic';
+
+    /**
+     * @OA\Property(type="string", format="uuid")
+     */
+    #[ORM\Id]
+    #[ORM\Column(
+        name: 'id',
+        type: UuidBinaryOrderedTimeType::NAME,
+        unique: true,
+    )]
+    #[Groups([
+        'UserGroup',
+        'UserGroup.id',
+
+        'ApiKey.userGroups',
+        'User.userGroups',
+        'Role.userGroups',
+
+        User::SET_USER_PROFILE,
+        self::SET_USER_PROFILE_GROUPS,
+        self::SET_USER_GROUP_BASIC,
+    ])]
+    private UuidInterface $id;
+
+    #[ORM\ManyToOne(
+        targetEntity: Role::class,
+        inversedBy: 'userGroups',
+    )]
+    #[ORM\JoinColumn(
+        name: 'role',
+        referencedColumnName: 'role',
+        onDelete: 'CASCADE',
+    )]
+    #[Groups([
+        'UserGroup.role',
+
+        User::SET_USER_PROFILE,
+        self::SET_USER_PROFILE_GROUPS,
+        self::SET_USER_GROUP_BASIC,
+    ])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Valid]
+    private Role $role;
+
+    #[ORM\Column(
+        name: 'name',
+        type: Types::STRING,
+        length: 255,
+    )]
+    #[Groups([
+        'UserGroup',
+        'UserGroup.name',
+
+        User::SET_USER_PROFILE,
+        self::SET_USER_PROFILE_GROUPS,
+        self::SET_USER_GROUP_BASIC,
+    ])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
+    private string $name = '';
+
+    /**
+     * @var Collection<int, User>|ArrayCollection<int, User>
+     */
+    #[ORM\ManyToMany(
+        targetEntity: User::class,
+        mappedBy: 'userGroups',
+    )]
+    #[ORM\JoinTable(
+        name: 'user_has_user_group',
+    )]
+    #[Groups([
+        'UserGroup.users',
+    ])]
+    private Collection | ArrayCollection $users;
+
+    /**
+     * @var Collection<int, ApiKey>|ArrayCollection<int, ApiKey>
+     */
+    #[ORM\ManyToMany(
+        targetEntity: ApiKey::class,
+        mappedBy: 'userGroups',
+    )]
+    #[ORM\JoinTable(
+        name: 'api_key_has_user_group',
+    )]
+    #[Groups([
+        'UserGroup.apiKeys',
+    ])]
+    private Collection | ArrayCollection $apiKeys;
+
+    public function __construct()
+    {
+        $this->id = $this->createUuid();
+
+        $this->users = new ArrayCollection();
+        $this->apiKeys = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return self::class;
+    }
+
+    public function getId(): string
+    {
+        return $this->id->toString();
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(Role $role): self
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>|ArrayCollection<int, User>
+     */
+    public function getUsers(): Collection | ArrayCollection
+    {
+        return $this->users;
+    }
+
+    /**
+     * @return Collection<int, ApiKey>|ArrayCollection<int, ApiKey>
+     */
+    public function getApiKeys(): Collection | ArrayCollection
+    {
+        return $this->apiKeys;
+    }
+
+    public function addUser(User $user): self
+    {
+        if ($this->users->contains($user) === false) {
+            $this->users->add($user);
+            $user->addUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function clearUsers(): self
+    {
+        $this->users->clear();
+
+        return $this;
+    }
+
+    public function addApiKey(ApiKey $apiKey): self
+    {
+        if ($this->apiKeys->contains($apiKey) === false) {
+            $this->apiKeys->add($apiKey);
+            $apiKey->addUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiKey(ApiKey $apiKey): self
+    {
+        if ($this->apiKeys->removeElement($apiKey)) {
+            $apiKey->removeUserGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function clearApiKeys(): self
+    {
+        $this->apiKeys->clear();
+
+        return $this;
+    }
+}

@@ -1,0 +1,66 @@
+<?php
+declare(strict_types = 1);
+/**
+ * /tests/Integration/DTO/src/DummyDto.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Integration\DTO\src;
+
+use Platform\DTO\RestDto;
+use Platform\DTO\RestDtoInterface;
+use Platform\Entity\Interfaces\EntityInterface;
+
+/**
+ * Class DummyDto
+ *
+ * @package App\Tests\Integration\Dto\src
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class DummyDto extends RestDto
+{
+    private string $foo = '';
+
+    public function setFoo(string $foo): self
+    {
+        $this->setVisited('foo');
+
+        $this->foo = $foo;
+
+        return $this;
+    }
+
+    public function getFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function isFoo(): bool
+    {
+        return (bool)$this->foo;
+    }
+
+    public function hasFoo(): bool
+    {
+        return (bool)$this->foo;
+    }
+
+    /**
+     * Method to load DummyDto data from specified entity.
+     */
+    public function load(EntityInterface $entity): RestDtoInterface
+    {
+        return $this;
+    }
+
+    /**
+     * Method to update specified entity with DummyDto data.
+     */
+    public function update(EntityInterface $entity): EntityInterface
+    {
+        parent::update($entity);
+
+        return $entity;
+    }
+}

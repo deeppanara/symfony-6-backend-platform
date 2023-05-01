@@ -1,0 +1,24 @@
+{
+	"name": "tarlepp/symfony-flex-backend-tools",
+	"description": "",
+	"require": {
+		"php": "^8.2.0"
+	},
+	"require-dev": {
+		"roave/security-advisories": "dev-latest",
+		"psalm/plugin-phpunit": "0.18.4",
+		"psalm/plugin-symfony": "5.0.3",
+		"vimeo/psalm": "5.9.0",
+		"weirdan/doctrine-psalm-plugin": "2.8.1"
+	},
+	"config": {
+		"allow-plugins": true,
+		"platform": {
+			"php": "8.2.0"
+		},
+		"preferred-install": {
+			"*": "dist"
+		},
+		"sort-packages": true
+	}
+}

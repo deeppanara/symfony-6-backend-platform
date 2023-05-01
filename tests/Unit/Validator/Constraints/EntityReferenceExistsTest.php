@@ -1,0 +1,28 @@
+<?php
+declare(strict_types = 1);
+/**
+ * /tests/Unit/Validator/Constraints/EntityReferenceExistsTest.php
+ *
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+
+namespace App\Tests\Unit\Validator\Constraints;
+
+use PHPUnit\Framework\Attributes\TestDox;
+use Platform\Validator\Constraints\EntityReferenceExists;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+/**
+ * Class EntityReferenceExistsTest
+ *
+ * @package App\Tests\Unit\Validator\Constraints
+ * @author TLe, Tarmo Leppänen <tarmo.leppanen@pinja.com>
+ */
+class EntityReferenceExistsTest extends KernelTestCase
+{
+    #[TestDox('Test that `getTargets` method returns expected')]
+    public function testThatGetTargetsReturnsExpected(): void
+    {
+        self::assertSame('property', (new EntityReferenceExists())->getTargets());
+    }
+}

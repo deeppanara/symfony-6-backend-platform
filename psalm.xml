@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<psalm
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config file://./tools/03_psalm/vendor/vimeo/psalm/config.xsd"
+    errorLevel="2"
+    rememberPropertyAssignmentsAfterCall="false"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+>
+    <projectFiles>
+        <directory name="src/" />
+        <directory name="tests/" />
+
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin" />
+        <pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin" />
+    </plugins>
+
+    <issueHandlers>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <referencedProperty name="App\Entity\UserGroup::$role" />
+                <referencedProperty name="App\Rest\RestResource::$validator" />
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+    </issueHandlers>
+</psalm>

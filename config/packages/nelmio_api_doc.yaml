@@ -1,0 +1,21 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Symfony Flex Backend
+            description: API documentation of this application.
+        #securityDefinitions:
+        #    Bearer:
+        #        type: apiKey
+        #        description: 'Value: Bearer {JSON Web Token (JWT)}'
+        #        name: Authorization
+        #        in: header
+        security:
+            - Bearer: []
+    areas:
+        default:
+            path_patterns:
+                - ^/api/doc
+                - ^/api/doc.json
+                - ^/(auth|healthz|version|profile|localization|v1)
+        internal:
+            with_annotation: true

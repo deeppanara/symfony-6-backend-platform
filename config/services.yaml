@@ -1,0 +1,91 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    app.config: '%env(json:file:APPLICATION_CONFIG)%'
+    env(DATABASE_NAME): '%env(string:key:DATABASE_NAME:json:file:APPLICATION_CONFIG)%'
+    env(DATABASE_URL): '%env(string:key:DATABASE_URL:json:file:APPLICATION_CONFIG)%'
+    env(JWT_PASSPHRASE): '%env(string:key:JWT_PASSPHRASE:json:file:APPLICATION_CONFIG)%'
+    env(JWT_PRIVATE_KEY_PATH): '%env(string:key:JWT_SECRET_KEY:json:file:APPLICATION_CONFIG)%'
+    env(JWT_PUBLIC_KEY_PATH): '%env(string:key:JWT_PUBLIC_KEY:json:file:APPLICATION_CONFIG)%'
+    env(CORS_ALLOW_ORIGIN): '%env(string:key:CORS_ALLOW_ORIGIN:json:file:APPLICATION_CONFIG)%'
+    env(TRUSTED_PROXIES): '%env(string:key:TRUSTED_PROXIES:json:file:APPLICATION_CONFIG)%'
+    locale: 'en'
+
+services:
+    # default configuration for services in *this* file
+    _defaults: &_services_defaults
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    Platform\:
+        resource: '../Platform/'
+        exclude:
+            - '../Platform/DataFixtures/'
+            - '../Platform/DependencyInjection/'
+            - '../Platform/Entity/'
+            - '../Platform/EventListener/'
+            - '../Platform/Kernel.php'
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DataFixtures/'
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/EventListener/'
+            - '../src/Kernel.php'
+
+    Platform\ValueResolver\EntityValueResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 150 }
+
+    Platform\EventListener\UserEntityEventListener:
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+
+when@dev:
+    services:
+        App\Tests\E2E\Rest\src\:
+            resource: '../tests/E2E/Rest/src/*'
+
+        App\Tests\E2E\Rest\Traits\Actions\src\:
+            resource: '../tests/E2E/Rest/Traits/Actions/src/*'
+
+        App\Tests\E2E\TestCase\:
+            resource: '../tests/E2E/TestCase/*'
+
+        App\Tests\Integration\Helpers\src\:
+            resource: '../tests/Integration/Helpers/src/*'
+
+        App\Tests\Utils\:
+            resource: '../tests/Utils/*'
+
+when@test:
+    services:
+        _defaults:
+            <<: *_services_defaults
+            public: true
+
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/*'
+
+        App\Tests\E2E\Rest\src\:
+            resource: '../tests/E2E/Rest/src/*'
+
+        App\Tests\E2E\Rest\Traits\Actions\src\:
+            resource: '../tests/E2E/Rest/Traits/Actions/src/*'
+
+        App\Tests\E2E\TestCase\:
+            resource: '../tests/E2E/TestCase/*'
+
+        App\Tests\Integration\Helpers\src\:
+            resource: '../tests/Integration/Helpers/src/*'
+
+        App\Tests\Utils\:
+            resource: '../tests/Utils/*'

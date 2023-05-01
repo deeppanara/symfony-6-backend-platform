@@ -1,0 +1,64 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        default_table_options:
+            charset: utf8mb4
+            collate: utf8mb4_swedish_ci
+        mapping_types:
+            enum: string
+        types:
+            datetime: Platform\Doctrine\DBAL\Types\UTCDateTimeType
+            datetimetz: Platform\Doctrine\DBAL\Types\UTCDateTimeType
+            EnumLanguage: Platform\Doctrine\DBAL\Types\EnumLanguageType
+            EnumLocale: Platform\Doctrine\DBAL\Types\EnumLocaleType
+            EnumLogLogin: Platform\Doctrine\DBAL\Types\EnumLogLoginType
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '15'
+
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            Platform:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/Platform/Entity'
+                prefix: 'Platform\Entity'
+                alias: Platform
+            App:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            logging: false
+
+when@prod:
+    doctrine:
+        dbal:
+            logging: false
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system
