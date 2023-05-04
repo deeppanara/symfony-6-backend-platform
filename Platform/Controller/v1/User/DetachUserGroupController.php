@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:34 pm
  * *************************************************************************
  */
 
@@ -35,12 +34,14 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 use Throwable;
+use OpenApi\Attributes as OAA;
 
 
 /**
  *
  */
 #[AsController]
+#[OAA\Tag(name: 'UserGroup Management')]
 class DetachUserGroupController
 {
     public function __construct(

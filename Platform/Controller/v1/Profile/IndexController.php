@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:17 pm
  * *************************************************************************
  */
 
@@ -39,6 +38,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  */
 #[AsController]
+#[OpenApi\Attributes\Tag(name: 'Profile Management')]
 class IndexController
 {
     public function __construct(

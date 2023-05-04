@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:34 pm
  * *************************************************************************
  */
 
@@ -32,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use OpenApi\Attributes as OA;
 use Throwable;
 
 /*
@@ -43,6 +43,7 @@ use Throwable;
  *
  */
 #[AsController]
+#[OA\Tag(name: 'User Management')]
 class DeleteUserController extends Controller
 {
     use \Platform\Rest\Traits\Methods\DeleteMethod;

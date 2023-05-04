@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:11 pm
  * *************************************************************************
  */
 
@@ -35,6 +34,7 @@ use function sprintf;
  *
  */
 #[AsController]
+#[\OpenApi\Attributes\Tag(name: 'Authentication')]
 class GetTokenController
 {
     /**
@@ -77,7 +77,6 @@ class GetTokenController
      *          @OA\Property(property="message", type="string", description="Error description"),
      *      ),
      *  )
-     * @OA\Tag(name="Authentication")
      *
      * @throws HttpException
      * @throws JsonException

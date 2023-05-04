@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:11 pm
  * *************************************************************************
  */
 
@@ -27,15 +26,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
-/*
- *
- * @OA\Tag(name="Localization")
- */
-
 /**
  *
  */
 #[AsController]
+#[\OpenApi\Attributes\Tag(name: 'Localization')]
 class LocaleController
 {
     public function __construct(

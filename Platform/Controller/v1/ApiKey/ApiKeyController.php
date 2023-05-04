@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:34 pm
  * *************************************************************************
  */
 
@@ -45,6 +44,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route(
     path: '/v1/api_key',
 )]
+#[\OpenApi\Attributes\Tag(name: 'ApiKey Management')]
 #[IsGranted(AuthenticatedVoter::IS_AUTHENTICATED_FULLY)]
 class ApiKeyController extends Controller
 {

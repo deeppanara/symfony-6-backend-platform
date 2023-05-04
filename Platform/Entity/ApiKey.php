@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:27 pm
  * *************************************************************************
  */
 
@@ -19,6 +18,7 @@ declare(strict_types = 1);
  */
 
 namespace Platform\Entity;
+
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

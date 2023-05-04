@@ -51,6 +51,12 @@ services:
 
 when@dev:
     services:
+        Platform\DataFixtures\:
+            resource: '../Platform/DataFixtures/*'
+            tags: [ 'doctrine.fixture.orm' ]
+            autowire: true
+            autoconfigure: true
+
         App\Tests\E2E\Rest\src\:
             resource: '../tests/E2E/Rest/src/*'
 

@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:17 pm
  * *************************************************************************
  */
 
@@ -40,6 +39,7 @@ use Throwable;
  *
  */
 #[AsController]
+#[OpenApi\Attributes\Tag(name: 'UserGroup Management')]
 class UsersController
 {
     public function __construct(

@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:36 pm
  * *************************************************************************
  */
 
@@ -41,6 +40,7 @@ use Throwable;
  *
  */
 #[AsController]
+#[\OpenApi\Attributes\Tag(name: 'Role Management')]
 class FindOneRoleController extends Controller
 {
     use \Platform\Rest\Traits\Methods\FindOneMethod;

@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  *
  * @author   Deep Panara <panaradeep@gmail.com>
- * @date     01/05/23, 12:36 pm
  * *************************************************************************
  */
 
@@ -20,18 +19,12 @@ declare(strict_types = 1);
 
 namespace Platform\Controller\v1\Role;
 
+use OpenApi\Attributes\Tag;
 use Platform\Rest\Traits\Actions;
 use Platform\Resource\RoleResource;
 use Platform\Rest\Controller;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
-
-/*
- *
- * @OA\Tag(name="Role Management")
- *
- * @method RoleResource getResource()
- */
 
 /**
  *
@@ -40,6 +33,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(
     path: '/v1/role',
 )]
+#[\OpenApi\Attributes\Tag(name: 'Role Management')]
 //#[IsGranted(AuthenticatedVoter::IS_AUTHENTICATED_FULLY)]
 class RoleController extends Controller
 {
